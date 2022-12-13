@@ -1,0 +1,4 @@
+1. change connectprm.json
+2. for PostgreSQL run script Create_tbl.sql
+3. go run main.go
+4. for PostgreSQL run script View_tbl.sql

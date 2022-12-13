@@ -1,0 +1,6 @@
+{
+    "host": "test.db.elephantsql.com",
+    "dbname": "test1",
+    "user": "test2",
+    "password": "test-psw12"
+}
