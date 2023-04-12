@@ -1,0 +1,30 @@
+{
+    "filename": "./examples/test_pay2.xlsx",
+    "sheet": "Лист1",
+    "rowfirst": 7,
+    "rowlast": 8,
+    "blocktype": "P",
+    "blockinfo": "load pay",	
+    "tablename": "pay_summ",
+    "fields":
+    [
+         {   
+             "name": "account",
+             "place": 1
+         }, 
+         {
+             "name": "summ",
+             "place": 3
+         },
+         {
+             "name": "pdate",
+             "place": 2,
+             "formatdate": "DD.MM.YYYY"
+         },
+         {
+             "name": "info",
+             "place": 4
+         }
+    ]
+}
+	

@@ -1,0 +1,200 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+    
+        <title>Loader</title>
+    
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
+        <!-- Font Awesome -->
+        <link rel="stylesheet"  href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
+
+        <!-- JQuery -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+ 
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+       
+        <!-- Vue.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.2.47/vue.global.min.js"></script>
+    
+         <!-- axios -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+
+    </head>
+    <body>
+        <div id="app">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h2></h2>
+                        <div class="input-group">
+                            <input type="text" 
+                                class="form-control" 
+                                placeholder="New Block" 
+                                v-on:keyup.enter="loadBlock"
+                                v-model="newBlock.info"/>
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button" v-on:click="loadBlock">Загрузить</button>
+                            </span>
+                        </div>
+
+                    </div>
+                    
+                    <div class="col">
+                    
+                    </div>                
+                </div>   
+                <div class="row">
+                    <div class="col-md-3">  
+                        <!-- ddd -->
+                        <h3>Файл Excel</h3>
+                        
+                        <input id="file-input" type="file" name="XlsFileName" />
+                    
+                        <label for="xls_sheet">Страница</label>
+                        <input type="text" class="form-control" placeholder="XLS Sheet" 
+                        v-model="newBlock.sheet" id="xls_sheet"/>
+                        <label for="xls_rowfirst">Номера строк</label> 
+                        <input type="text" class="form-control" placeholder="Rowfirst" 
+                        v-model.number="newBlock.rowfirst" id="xls_rowfirst"/>
+                        <input type="text" class="form-control" placeholder="Rowlast" 
+                        v-model.number="newBlock.rowlast" id="xls_rowlast"/>
+                        <div id="v-model-radiobutton">
+                            <input type="radio" id="svc" value="S" v-model="newBlock.type_code" />
+                            <label for="svc">Услуги</label>
+                            <br />
+                            <input type="radio" id="pay" value="P" v-model="newBlock.type_code" />
+                            <label for="pay">Оплаты</label>
+                            <br />
+                        </div>
+                    </div> 
+                </div>   
+            
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>Список блоков</h3>
+                        <ul class="list-group">
+                            <li class="list-group-item" v-for="(bk, index) in blocks" :key="bk.id">
+                                {{ bk.id }} {{ bk.info }} {{ bk.status_name }}  {{ bk.status_date }}
+                                <span class="pull-right">
+                                    <button class="btn btn-xs btn-info" v-on:click="statusBlock(index)">
+                                        <i class="fa fa-circle-o" aria-hidden="true"></i>
+                                    </button>
+                                </span>
+                            </li>
+                        </ul>
+                    </div> 
+                </div>   
+        
+            </div>
+        </div>
+
+        <script>
+            const app = Vue.createApp({
+                el: '#app',
+                data() {
+                    return {
+                    blocks: [],
+                    newBlock: {
+                        info: "",
+                        type_code: "S",
+                        filename: "",
+                        sheet: "",
+                        rowfirst: 0,
+                        rowlast: 0
+
+                    },
+                    }
+                },
+            
+                // current block list
+                created: function() {
+                    // Use  axios to fetch data from the /blocks route
+                    axios.get("/blocks").then((response) => {
+                        this.blocks = response.data.items ? response.data.items : []
+                    },  
+                    (error) => {
+                        console.log('get blocks error')
+                    }  
+                    )
+                },
+            
+                methods: {
+                    async sendFile() {
+                        const fileInput = document.querySelector('#file-input')
+                        var data = new FormData()
+
+                        data.append('xlsfile', fileInput.files[0])
+                        await axios.post("/uploadfile", data).then((response) => {
+                            this.newBlock.filename = response.data.filename
+                        }),  
+                        (error) => {
+                            this.newBlock.filename = ""
+                            console.log("error send file")
+                        }; 
+                        
+                    },
+
+                    checkInput() {
+                        if (this.newBlock.info.length == 0) {
+                            alert("info is not specified")
+                            return false
+                        }
+                        if (this.newBlock.sheet.length == 0) {
+                            alert("sheet is not specified")
+                            return false
+                        }
+                        const fileInput = document.querySelector('#file-input')
+                        if (fileInput.files[0] == undefined) {
+                            alert("file is not specified")
+                            return false
+                        }
+                        
+                        return true
+                    },
+
+                    loadBlock() {
+                        if (this.checkInput()) {
+                            console.log("start load new block")
+                            // send and wait
+                            this.sendFile().then(() => {
+                                console.log("send file - " + this.newBlock.filename)
+                                console.log("start post for load")
+                                axios.post("/load", this.newBlock).then((response) => {
+                                    this.blocks.splice(0, 0, response.data);
+                                    console.log("post was done")
+                                },  
+                                (error) => {
+                                    console.log("error load new block")
+                                }  
+                                )                    
+                            });
+                        }
+                    },
+
+                    statusBlock: function(index) {
+                        axios.get("/block/" + this.blocks[index].id).then( (response) => {
+                            bk = response.data
+                            this.blocks[index] = bk
+                            alert(" Block id: " + bk.id + 
+                                "\n status: " + bk.status_name +
+                                "\n loaded records: " + bk.count_rec 
+                            )
+                            console.log("get block on id " + bk.id)
+                        },  
+                        (error) => {
+                            console.log("get block on id error")
+                        }); 
+                        
+                    }
+
+                }
+    
+            })
+            const vm = app.mount('#app')
+
+        </script>
+    </body>
+</html>

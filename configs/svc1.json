@@ -1,0 +1,30 @@
+{
+    "filename": "./examples/test_svc1.xlsx",
+    "sheet": "Лист1",
+    "rowfirst": 5,
+    "rowlast": 6,
+    "blocktype": "S",
+    "blockinfo": "load svc",
+    "tablename": "svc_summ",
+    "fields":
+    [
+        {   
+            "name": "account",
+            "place": 1
+        }, 
+        {
+            "name": "code",
+            "place": 2
+        }, 
+        {
+            "name": "summ",
+            "place": 3
+        },
+        {	
+            "name": "sdate",
+            "place": 4,
+            "formatdate": "DD.MM.YYYY"
+        }
+    ]
+}
+	
