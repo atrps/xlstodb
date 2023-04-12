@@ -1,6 +1,6 @@
 {
     "filename": "./examples/test_pay2.xlsx",
-    "sheet": "Лист1",
+    "sheet": "Test",
     "rowfirst": 7,
     "rowlast": 8,
     "blocktype": "P",

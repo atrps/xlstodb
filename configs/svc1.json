@@ -1,6 +1,6 @@
 {
     "filename": "./examples/test_svc1.xlsx",
-    "sheet": "Лист1",
+    "sheet": "Test",
     "rowfirst": 5,
     "rowlast": 6,
     "blocktype": "S",
